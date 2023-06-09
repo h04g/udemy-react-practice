@@ -1,17 +1,24 @@
 
+import { useState } from 'react';
 import './App.scss';
 import Header from './components/Header';
+
 import TableUsers from './components/TableUsers';
 import Container from 'react-bootstrap/Container';
-import { Row } from 'react-bootstrap';
+import { ToastContainer, toast } from 'react-toastify';
+
 
 function App() {
+
+ 
   return (
+    <>
     <div className='app-container'>
       {/* <Container>
         <Row> */}
           <Header/>
           <Container>
+            
             <TableUsers/>
           </Container>
           
@@ -20,6 +27,19 @@ function App() {
       
       
     </div>
+    <ToastContainer
+position="top-right"
+autoClose={5000}
+hideProgressBar={false}
+newestOnTop={false}
+closeOnClick
+rtl={false}
+pauseOnFocusLoss
+draggable
+pauseOnHover
+theme="dark"
+/>
+    </>
   );
 }
 
