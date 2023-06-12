@@ -1,12 +1,14 @@
 import Table from 'react-bootstrap/Table';
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+
 import { fetchAllUser } from '../services/userServices';
 import ModalAddNew from './ModalAddNew';
+import ModalConfirm from './ModalConfirm';
 
-import ReactDOM from 'react-dom';
+
 import ReactPaginate from 'react-paginate';
 import ModalEditUser from './ModalEditUser';
+import _ from "lodash";
 
 const TableUsers = (props) => {
 
@@ -16,16 +18,31 @@ const TableUsers = (props) => {
     
     const [isShowModalAddNew, setIsShowModalAddNew] = useState(false);
     const [isShowModalEditUser, setIsShowModalEditUser] = useState(false);
+    const [isShowModalDelete, setIsShowModalDelete] = useState(false);
+
     const [ dataUserEdit, setDataUserEdit] = useState({})
+    const [ dataUserDelete, setDataUserDelete] = useState({})
 
     const handleClose = () => {
       setIsShowModalAddNew(false);
-      setIsShowModalEditUser(false)
+      setIsShowModalEditUser(false);
+      setIsShowModalDelete(false)
     }
 
     const handleUpdateTable = (user) => {
       setListUsers ([user, ...listUsers])
     }
+
+    const handleEditUserFromModal = (user) => {
+      let cloneListUsers = _.cloneDeep(listUsers)
+      let index = listUsers.findIndex(item => item.id === user.id);
+      cloneListUsers[index].first_name = user.first_name;
+      setListUsers(cloneListUsers);
+    }
+
+
+
+
     useEffect( () => {
         //call APIs
         getUsers(1);
@@ -40,7 +57,7 @@ const TableUsers = (props) => {
         let res = await fetchAllUser(page);
 
         if( res && res.data){
-          console.log(res)
+          
           setTotalUsers(res.total)
             setListUsers(res.data);
             setTotalPages(res.total_pages);
@@ -49,7 +66,7 @@ const TableUsers = (props) => {
     }
 
     const handlePageClick = (event) => {
-      console.log("event lib:", event)
+      
       getUsers(+event.selected + 1)
 
     }
@@ -59,6 +76,10 @@ const TableUsers = (props) => {
       setIsShowModalEditUser(true);
 
 
+    }
+    const handleDeleteUser = (user) => {
+      setIsShowModalDelete(true);
+      setDataUserDelete(user)
     }
     return (<>
     <div className='my-3 add-new'>
@@ -93,7 +114,9 @@ const TableUsers = (props) => {
                               <button 
                                 className='btn btn-warning mx-3'
                                 onClick={()=> handleEditUSer(item)} >Edit</button>
-                              <button className='btn btn-danger'>Delete</button>
+                              <button 
+                                className='btn btn-danger'
+                                onClick={()=> handleDeleteUser(item)}>Delete</button>
                             </td>
         </tr>
                     )
@@ -135,6 +158,13 @@ const TableUsers = (props) => {
           show={isShowModalEditUser}
           dataUserEdit={dataUserEdit}
           handleClose = {handleClose}
+          handleEditUserFromModal = {handleEditUserFromModal}
+          />
+          <ModalConfirm
+
+          show={isShowModalDelete}
+          handleClose = {handleClose}
+          dataUserDelete ={dataUserDelete}
           />
   
     </>)
