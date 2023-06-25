@@ -8,7 +8,8 @@ import ModalConfirm from './ModalConfirm';
 
 import ReactPaginate from 'react-paginate';
 import ModalEditUser from './ModalEditUser';
-import _, { clone } from "lodash";
+import _, { clone, debounce } from "lodash";
+import { CSVLink, CSVDownload } from "react-csv"
 
 import './TableUser.scss'
 
@@ -28,6 +29,7 @@ const TableUsers = (props) => {
 
     const [ sortBy, setSortBy ] = useState("asc");
     const [ sortField, setSortField ] = useState ("id")
+    const [ keyword, setKeyword] = useState("")
 
     const handleClose = () => {
       setIsShowModalAddNew(false);
@@ -100,13 +102,59 @@ const TableUsers = (props) => {
       cloneListUsers = _.orderBy(cloneListUsers, [sortField], [sortBy])
       setListUsers(cloneListUsers);
     }
+
+    const handleSearch = debounce( (event) => {
+      let term = event.target.value;
+      if(term){
+
+        let cloneListUsers = _.cloneDeep(listUsers)
+        cloneListUsers = cloneListUsers.filter(item => item.email.includes(term))
+        setListUsers (cloneListUsers)
+        
+
+      }else{
+        getUsers(1);
+      }
+
+    }, 500)
+
+    const csvData = [
+      
+    ]
+
     return (<>
     <div className='my-3 add-new'>
               <span>List Users:</span>
-              <button className='btn btn-success'
-              onClick={()=> setIsShowModalAddNew(true)}
-              >Add new User</button>
-            </div>
+              <div className='group-btns'>
+                <label htmlFor='import' className='btn btn-warning'>
+                  <i className='fa-solid fa-file-import'></i> Import
+                </label>
+                <input id='import' type='file' hidden />
+                
+                
+                <CSVLink
+                  filename={"users.csv"}
+                  className="btn btn-primary"
+                  
+                  data={listUsers}>
+                    <i className='fa-solid fa-file-arrow-down'></i> Export
+                  </CSVLink>
+
+                <button className='btn btn-success'
+                        onClick={(event)=> setIsShowModalAddNew(true)}
+                >
+                  <i className='fa-solid fa-circle-plus'></i> Add new</button>
+              </div>
+    </div>
+
+    <div className='col-4 my-3' >
+      <input
+        className='form-control' 
+        placeholder='Search By Email...' 
+        
+        // value={keyword}
+        onChange={(event) => handleSearch(event)}/>
+    </div>
 
     <Table striped bordered hover>
       <thead>
