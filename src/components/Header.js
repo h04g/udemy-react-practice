@@ -6,13 +6,16 @@ import logoApp from '../assets/images/logo192.png';
 import {useLocation, useNavigate} from 'react-router-dom'
 import { NavLink } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useContext, useEffect, useState } from 'react';
+import { UserContext } from '../context/UserContext';
 
 const Header = (props) => {
+  const {logout, user} = useContext(UserContext)
 
   const location  = useLocation();
   const navigate = useNavigate()
   const handleLogOut = () => {
-    localStorage.removeItem("token");
+    logout()
     navigate("/")
     toast.error("logout success")
 
@@ -35,19 +38,21 @@ const Header = (props) => {
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
+          {(user && user.auth || window.location.pathname === '/' ) && <>
           <Nav className="me-auto">
               <NavLink to="/" className="nav-link">Home</NavLink>             
               <NavLink to="/users" className="nav-link" >Manage Users</NavLink>    
           </Nav>     
           <Nav> 
+          {user && user.email &&<span className='nav-link'>Welcome {user.email} </span> }
             <NavDropdown title="Setting">
-              
-              <NavLink to="/login" className="dropdown-item">LogIn</NavLink> 
-              
-              <NavDropdown.Item onClick={()=> handleLogOut()} >LogOut</NavDropdown.Item>
+              {user && user.auth === true 
+              ? <NavDropdown.Item onClick={()=> handleLogOut()} >LogOut</NavDropdown.Item>
+              :  <NavLink to="/login" className="dropdown-item">LogIn</NavLink> 
+              }
             </NavDropdown>
           </Nav>
-          
+          </>}
         </Navbar.Collapse>
       </Container>
     </Navbar>
