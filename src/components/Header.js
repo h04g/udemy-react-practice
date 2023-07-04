@@ -7,19 +7,27 @@ import {useLocation, useNavigate} from 'react-router-dom'
 import { NavLink } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useContext, useEffect, useState } from 'react';
-import { UserContext } from '../context/UserContext';
+import { useSelector, useDispatch} from 'react-redux'
+import { handleLogOutRedux } from '../redux/actions/userAction';
+
 
 const Header = (props) => {
-  const {logout, user} = useContext(UserContext)
+ 
 
-  const location  = useLocation();
+  const user = useSelector(state => state.user.account)
+  const dispatch = useDispatch();
+
   const navigate = useNavigate()
+  
   const handleLogOut = () => {
-    logout()
-    navigate("/")
-    toast.error("logout success")
-
+    dispatch(handleLogOutRedux());
   }
+  useEffect(()=> {
+    if(user && user.auth === false){
+      navigate("/")
+      toast.error("logout success")
+    }
+  }, [user])
     return (<>
 
     <Navbar bg="light" expand="lg">

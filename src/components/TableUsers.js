@@ -195,9 +195,9 @@ const TableUsers = (props) => {
     }
 
     return (<>
-    <div className='my-3 add-new'>
-              <span>List Users:</span>
-              <div className='group-btns'>
+    <div className="my-3 add-new d-sm-flex">
+              <span className="">List Users:</span>
+              <div className='group-btns mt-sm-0 mt-0'>
                 <label htmlFor='import' className='btn btn-warning'>
                   <i className='fa-solid fa-file-import'></i> Import
                 </label>
@@ -224,7 +224,7 @@ const TableUsers = (props) => {
               </div>
     </div>
 
-    <div className='col-4 my-3' >
+    <div className='col-12 col-sm-4 my-3' >
       <input
         className='form-control' 
         placeholder='Search By Email...' 
@@ -232,8 +232,8 @@ const TableUsers = (props) => {
         // value={keyword}
         onChange={(event) => handleSearch(event)}/>
     </div>
-
-    <Table striped bordered hover>
+    <div className='custom-table'>
+    <Table striped bordered hover >
       <thead>
         <tr>
           <th > 
@@ -296,6 +296,8 @@ const TableUsers = (props) => {
         
       </tbody>
     </Table>
+    </div>
+    
     <ReactPaginate
         breakLabel="..."
         nextLabel="next >"

@@ -1,24 +1,20 @@
-import { useState, useContext } from "react";
-import { loginApi } from "../services/userServices";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { UserContext } from "../context/UserContext";
 
+import { handleLoginRedux } from "../redux/actions/userAction";
+import { useDispatch, useSelector} from "react-redux"
 const Login = () => {
-    const {loginContext} = useContext(UserContext)
+    
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("")
-    const [ loadingLogin, setLoadingLogin] = useState(false)
 
-    useEffect(()=> {
-        let token = localStorage.getItem("token");
-        if(token){
-            navigate("/")
-        }
-    },[])
-
+    const isLoading = useSelector(state => state.user.isLoading )
+    const account = useSelector(state => state.user.account )
 
     const handleLogin = async () => {
         if(!email || !password){
@@ -26,24 +22,25 @@ const Login = () => {
             return;
 
         }
-        setLoadingLogin(true)
-        let res = await loginApi(email, password);
-        if(res && res.token) {
-            loginContext(email, res.token)
-            navigate("/")
-        }else {
-            if(res && res.status === 400){
-                toast.error(res.data.error)
-            }
-        }
-        setLoadingLogin(false)
-
+        dispatch(handleLoginRedux(email, password));
     }
 
     const handleGoBack = () => {
         navigate("/")
 
     }
+    const handlePressEnter = async (event) => {
+        if(event && event.key === 'Enter'){
+           await handleLogin() ;
+        }
+         
+    }
+
+    useEffect (()=> {
+        if (account && account.auth === true){
+            navigate("/")
+        }
+    }, [account])
     return (
         <>
              <div className="login-container col-12 col-sm-4 ">
@@ -62,7 +59,9 @@ const Login = () => {
                     type="password" 
                         placeholder="Password...."
                         value={password}
-                    onChange={(event) => setPassword(event.target.value)}
+                        onChange={(event) => setPassword(event.target.value)}
+                        onKeyDown={(event)=>handlePressEnter(event)}
+
                          />
                     
                 </div>
@@ -71,7 +70,7 @@ const Login = () => {
                     className={email && password ? "active": ""}
                     disabled={(email && password ) ? false : true}
                     onClick={()=>handleLogin()}>
-                        {loadingLogin && <i className="fa-solid fa-sync fa-spin"></i>}
+                        {isLoading && <i className="fa-solid fa-sync fa-spin"></i>}
                         
                         &nbsp;Login</button>
                 <div className="back">
